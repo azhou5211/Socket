@@ -115,9 +115,6 @@ class socket:
     def listen(self, backlog):
         return
 
-    def createPacket(self, flags=0x0, header_len=0x0, sequence_no=0x0, ack_no=0x0, payload_len=0x0):
-        return
-
     def accept(self):
 
         if self.connectindex == True:
@@ -139,13 +136,20 @@ class socket:
                 data, addr = self.recvfrom(hearder_len)
                 serverRespond = udpPkt_hdr_data.unpack(data)
 
-                ack_no = serverRespond[9] + 1
-                receiveIndex = True
+                if serverRespond[1] == 0x1:
+                    ack_no = serverRespond[9] + 1
+                    receiveIndex = True
 
             except syssock.timeout:
                 pass
 
-        replyHeader = 
+
+        payload_len = serverRespond[11]
+        #flag can be both SYN and ACK???
+        flags = 0x04
+        replyHeader = udpPkt_hdr_data.pack(0x1, flags, 0x0, 0x0, hearder_len, 0x0, 0x0, 0x0, sequence_no_server, ack_no, 0x0, payload_len)
+        self.sendto(replyHeader, (addr, sendpt))
+
 
         (clientsocket, address) = (1, 1)  # change this to your code
 
