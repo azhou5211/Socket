@@ -10,7 +10,8 @@ import random
 # define the UDP ports all messages are sent
 # and received from
 
-
+packetHeaderFormat = "!BBBBHHLLQQLL"
+packetHeaderLength = struct.calcsize(packetHeaderFormat)
 
 receivept = 0
 sendpt = 0
@@ -112,6 +113,23 @@ class socket:
 
         return
 
+    def createPacket(self, flags=0x0, header_len=0x0, sequence_no=0x0, ack_no=0x0, payload_len=0x0):
+        return struct.Struct(packetHeaderFormat).pack \
+            (
+                0x1,  # version
+                flags,  # flags
+                0x0,  # opt_ptr
+                0x0,  # protocol
+                header_len,  # header_len
+                0x0,  # checksum
+                0x0,  # source_port
+                0x0,  # dest_port
+                sequence_no,  # sequence_no
+                ack_no,  # ack_no
+                0x0,  # window
+                payload_len  # payload_len
+            )
+
     def listen(self, backlog):
         return
 
@@ -124,10 +142,11 @@ class socket:
         sequence_no_server = random.randint(1,99999)
         self.sequenceNo = sequence_no_server
 
-        packet_fmt = '!BBBBHHLLQQLL'
-        udpPkt_hdr_data = struct.Struct(packet_fmt)
+        #packet_fmt = '!BBBBHHLLQQLL'
+        # Use the createPacket method instead
+        #udpPkt_hdr_data = struct.Struct(packet_fmt)
 
-        hearder_len = struct.calcsize(packet_fmt)
+        header_len = struct.calcsize(packet_fmt)
         receiveIndex = False
         ack_no = 0
         while receiveIndex is False:
